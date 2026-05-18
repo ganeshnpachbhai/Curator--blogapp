@@ -1,0 +1,57 @@
+{% extends 'blog_app/base.html' %}
+
+{% block title %}All Posts - The Curator{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    <h1 style="text-transform: capitalize;">
+        {% if tag_name %}
+            #{{ tag_name }}
+        {% elif category_name %}
+            {{ category_name }} Insights
+        {% elif query %}
+            Results for "{{ query }}"
+        {% else %}
+            All Curated Thoughts
+        {% endif %}
+    </h1>
+    <p>
+        {% if tag_name %}
+            Posts tagged with #{{ tag_name }}.
+        {% elif category_name %}
+            Exploring the finest in {{ category_name }}.
+        {% else %}
+            Every story has its place.
+        {% endif %}
+    </p>
+</div>
+
+
+<div class="post-grid mt-2">
+    {% for post in posts %}
+    <div class="post-card">
+        {% if post.image %}
+            <img src="{{ post.image.url }}" alt="{{ post.title }}">
+        {% else %}
+            <img src="https://via.placeholder.com/400x250?text=No+Image" alt="No Image">
+        {% endif %}
+        <div class="post-card-content">
+            <div class="post-card-meta">{{ post.created_at|date:"F d, Y" }} | {{ post.category.name|default:"Uncategorized" }}</div>
+            <h3>{{ post.title }}</h3>
+            <p>{{ post.body|truncatewords:25 }}</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 10px;">
+                <a href="{% url 'profile' post.author.username %}" style="font-size: 0.85rem; color: var(--text-muted); text-decoration: none;">
+                    <i class="fa fa-user"></i> {{ post.author.username }}
+                </a>
+                <a href="{% url 'post_detail' post.pk %}" class="btn" style="padding: 6px 15px; font-size: 0.85rem; margin: 0;">View Post</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="text-center" style="grid-column: 1 / -1;">
+        <p>The archives are empty.</p>
+        <a href="{% url 'create' %}" class="btn">Start the Conversation</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

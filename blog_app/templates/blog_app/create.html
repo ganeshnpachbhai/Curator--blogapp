@@ -1,0 +1,49 @@
+{% extends 'blog_app/base.html' %}
+
+{% block title %}Draft a Thought - The Curator{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>Draft a Thought</h1>
+    <p>Every word deserves its space.</p>
+    
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <label>Post Title</label>
+        {{ form.title }}
+        
+        <label>Category</label>
+        {{ form.category }}
+        
+        <label>The Narrative</label>
+        {{ form.body }}
+        
+        <label>Cover Visual</label>
+        <div class="image-preview" id="image-preview">
+            <span style="color: #999;">No image selected</span>
+        </div>
+        {{ form.image }}
+        
+        <button type="submit" class="btn btn-block">Publish Post</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const imageInput = document.querySelector('input[type="file"]');
+    const previewContainer = document.getElementById('image-preview');
+
+    imageInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewContainer.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+{% endblock %}

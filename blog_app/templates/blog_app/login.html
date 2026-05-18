@@ -1,0 +1,26 @@
+{% extends 'blog_app/base.html' %}
+
+{% block title %}Sign In - The Curator{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>The Curator</h1>
+    <p>Enter the sanctuary of curated thought.</p>
+    
+    <form action="{% url 'login' %}" method="POST">
+        {% csrf_token %}
+        
+        <label>Username</label>
+        {{ form.username }}
+        
+        <label>Password</label>
+        {{ form.password }}
+        
+        <button type="submit" class="btn btn-block">Sign In</button>
+        
+        <p style="margin-top: 20px;">
+            New to the circle? <a href="{% url 'register' %}"><strong>Create an account</strong></a>
+        </p>
+    </form>
+</div>
+{% endblock %}

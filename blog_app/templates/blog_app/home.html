@@ -1,0 +1,186 @@
+{% extends 'blog_app/base.html' %}
+
+{% block title %}Home - The Curator{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+{% with featured_post=posts|first %}
+{% if featured_post %}
+<div class="hero">
+    {% if featured_post.image %}
+        <img src="{{ featured_post.image.url }}" class="hero-img" alt="{{ featured_post.title }}">
+    {% else %}
+        <img src="https://images.unsplash.com/photo-1499750310107-5fef28a66643?q=80&w=2070&auto=format&fit=crop" class="hero-img" alt="Hero">
+    {% endif %}
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <div class="post-card-meta" style="background: var(--primary); color: white;">Featured Insight</div>
+        <h1 style="color: white; font-size: 3rem; margin: 20px 0;">{{ featured_post.title }}</h1>
+        <p style="font-size: 1.2rem; margin-bottom: 30px; opacity: 0.9;">{{ featured_post.body|truncatewords:25 }}</p>
+        <a href="{% url 'post_detail' featured_post.pk %}" class="btn">Start Reading <i class="fa fa-arrow-right"></i></a>
+    </div>
+</div>
+{% endif %}
+{% endwith %}
+
+<!-- Categories Section -->
+<h3 style="text-align: left; margin-bottom: 30px;">Explore by Interest</h3>
+<div class="category-grid">
+    <a href="{% url 'post_list' %}?category=Technology" class="category-card">
+        <i class="fa fa-microchip"></i>
+        <span>Technology</span>
+    </a>
+    <a href="{% url 'post_list' %}?category=Business" class="category-card">
+        <i class="fa fa-briefcase"></i>
+        <span>Business</span>
+    </a>
+    <a href="{% url 'post_list' %}?category=Politics" class="category-card">
+        <i class="fa fa-landmark"></i>
+        <span>Politics</span>
+    </a>
+    <a href="{% url 'post_list' %}?category=Life Style" class="category-card">
+        <i class="fa fa-couch"></i>
+        <span>Lifestyle</span>
+    </a>
+
+    <a href="{% url 'post_list' %}?category=Astrology" class="category-card">
+        <i class="fa fa-moon"></i>
+        <span>Astrology</span>
+    </a>
+</div>
+
+
+<!-- Main Layout with Sidebar -->
+<div class="layout-with-sidebar">
+    <!-- Blog Listing Section -->
+    <div>
+        <h3 style="text-align: left; margin-bottom: 30px;">Latest from the Curator</h3>
+        <div class="post-grid" id="post-grid">
+            {% for post in posts %}
+            <div class="post-card">
+                {% if post.image %}
+                    <img src="{{ post.image.url }}" alt="{{ post.title }}">
+                {% else %}
+                    <img src="https://via.placeholder.com/400x250?text=The+Curator" alt="No Image">
+                {% endif %}
+                <div class="post-card-content">
+                    <div class="post-card-meta">{{ post.category.name|default:"General" }}</div>
+                    <h3>{{ post.title }}</h3>
+                    <p>{{ post.body|truncatewords:20 }}</p>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
+                        <a href="{% url 'profile' post.author.username %}" style="font-size: 0.85rem; color: var(--text-muted); text-decoration: none;">
+                            <i class="fa fa-user-circle"></i> {{ post.author.username }}
+                        </a>
+                        <a href="{% url 'post_detail' post.pk %}" class="btn" style="padding: 6px 15px; font-size: 0.85rem;">Read <i class="fa fa-book-open"></i></a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center" style="grid-column: 1 / -1;">
+                <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" style="width: 100px; opacity: 0.3; margin-bottom: 20px;">
+                <p>The sanctuary is quiet. Why not <a href="{% url 'create' %}">share a thought?</a></p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination Placeholder -->
+        {% if page_obj.has_next %}
+        <div class="text-center mt-2" id="load-more-container">
+            <button class="btn btn-secondary" id="load-more-btn" data-url="?page={{ page_obj.next_page_number }}">
+                <i class="fa fa-sync-alt" id="load-more-icon"></i> <span id="load-more-text">Load More Thoughts</span>
+            </button>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar Section -->
+    <aside class="sidebar">
+        <div class="sidebar-widget">
+            <h4>Search</h4>
+            <form action="{% url 'post_list' %}" method="GET" style="display: flex; gap: 5px;">
+                <input type="text" name="q" placeholder="Type to search..." style="margin: 0;">
+                <button class="btn" style="margin: 0; padding: 10px;"><i class="fa fa-search"></i></button>
+            </form>
+        </div>
+
+        <div class="sidebar-widget">
+            <h4>Popular Right Now</h4>
+            <div class="sidebar-list">
+                {% for post in posts|slice:":4" %}
+                <a href="{% url 'post_detail' post.pk %}" class="sidebar-list-item" style="text-decoration: none;">
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" alt="thumb">
+                    {% else %}
+                        <img src="https://via.placeholder.com/60/6366f1/ffffff?text=C" alt="thumb">
+                    {% endif %}
+                    <div class="sidebar-list-item-content">
+                        <h5>{{ post.title|truncatechars:35 }}</h5>
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">{{ post.created_at|date:"M d" }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+
+    </aside>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    const postGrid = document.getElementById('post-grid');
+    const loadMoreContainer = document.getElementById('load-more-container');
+    let isLoading = false;
+
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (isLoading) return;
+
+            const url = this.getAttribute('data-url');
+            if (!url) return;
+
+            isLoading = true;
+            const icon = document.getElementById('load-more-icon');
+            const text = document.getElementById('load-more-text');
+            
+            icon.classList.add('fa-spin');
+            text.innerText = 'Loading...';
+
+            fetch(url, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                // Append new posts
+                postGrid.insertAdjacentHTML('beforeend', data.html);
+
+                // Update pagination state
+                if (data.has_next) {
+                    loadMoreBtn.setAttribute('data-url', '?page=' + data.next_page_number);
+                } else {
+                    loadMoreContainer.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching posts:', error);
+                text.innerText = 'Error loading. Try again.';
+            })
+            .finally(() => {
+                if(loadMoreContainer.style.display !== 'none'){
+                    icon.classList.remove('fa-spin');
+                    text.innerText = 'Load More Thoughts';
+                }
+                isLoading = false;
+            });
+        });
+    }
+});
+</script>
+{% endblock %}

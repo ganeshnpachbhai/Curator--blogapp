@@ -1,0 +1,38 @@
+{% extends 'blog_app/base.html' %}
+
+{% block title %}Join the Circle - The Curator{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>The Curator</h1>
+    <p>JOIN OUR EDITORIAL SANCTUARY</p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        
+        <label>Username</label>
+        {{ form.username }}
+        
+        <label>Email Address</label>
+        {{ form.email }}
+        
+        <label>Password</label>
+        {{ form.password1 }}
+        
+        <label>Confirm Password</label>
+        {{ form.password2 }}
+        
+        <button type="submit" class="btn btn-block">Create Account</button>
+        
+        <p style="margin-top: 20px;">
+            Already have an account? <a href="{% url 'login' %}"><strong>Sign in instead</strong></a>
+        </p>
+    </form>
+
+    <div class="quote" style="margin-top: 30px; padding: 20px; border-left: 4px solid var(--seed); background: #f9f9f9; border-radius: 4px;">
+        <p style="font-style: italic; text-align: left; margin: 0;">
+            "Design is the silent ambassador of your brand. Join a community that values the space between the lines."
+        </p>
+    </div>
+</div>
+{% endblock %}

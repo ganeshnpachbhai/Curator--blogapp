@@ -1,0 +1,17 @@
+{% extends 'blog_app/base.html' %}
+
+{% block title %}Delete Thought - The Curator{% endblock %}
+
+{% block content %}
+<div class="form-container text-center">
+    <h1>Delete Thought</h1>
+    <p>Are you sure you want to remove <strong>"{{ post.title }}"</strong> from the archives?</p>
+    <p>This action cannot be undone.</p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger btn-block">Confirm Deletion</button>
+        <a href="{% url 'post_detail' post.pk %}" class="btn btn-secondary btn-block">Cancel and Keep</a>
+    </form>
+</div>
+{% endblock %}

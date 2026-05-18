@@ -1,0 +1,20 @@
+{% for post in posts %}
+<div class="post-card" style="opacity: 0; animation: fadeIn 0.5s forwards;">
+    {% if post.image %}
+        <img src="{{ post.image.url }}" alt="{{ post.title }}">
+    {% else %}
+        <img src="https://via.placeholder.com/400x250?text=The+Curator" alt="No Image">
+    {% endif %}
+    <div class="post-card-content">
+        <div class="post-card-meta">{{ post.category.name|default:"General" }}</div>
+        <h3>{{ post.title }}</h3>
+        <p>{{ post.body|truncatewords:20 }}</p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: auto;">
+            <a href="{% url 'profile' post.author.username %}" style="font-size: 0.85rem; color: var(--text-muted); text-decoration: none;">
+                <i class="fa fa-user-circle"></i> {{ post.author.username }}
+            </a>
+            <a href="{% url 'post_detail' post.pk %}" class="btn" style="padding: 6px 15px; font-size: 0.85rem;">Read <i class="fa fa-book-open"></i></a>
+        </div>
+    </div>
+</div>
+{% endfor %}
